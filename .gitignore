@@ -1,0 +1,67 @@
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.npm
+.eslintcache
+
+# Build directories (local development builds - NEVER commit)
+build/
+dist/
+out/
+
+# Compiled binaries (local development - NEVER commit)
+*.node
+
+# Prebuilds (prebuilt binaries for distribution)
+# UNCOMMENT the line below if you DON'T want to commit prebuilds to git
+# (They can be uploaded as GitHub release assets instead)
+# prebuilds/
+#
+# LEAVE COMMENTED if you want to commit prebuilds to git for npm distribution
+
+# OS files
+.DS_Store
+Thumbs.db
+*~
+*.swp
+*.swo
+
+# IDE files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# Logs
+logs/
+*.log
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Package files (keep package.json and package-lock.json)
+*.tgz
+
+# Python (for node-gyp)
+__pycache__/
+*.py[cod]
+*$py.class
+
+# VS Code SQLTools extension build
+sqltools-driver/out/
+sqltools-driver/dist/
+sqltools-driver/*.vsix

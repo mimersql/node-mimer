@@ -1,0 +1,120 @@
+name: Build Prebuilds
+
+on:
+  push:
+    branches: [ main, master ]
+    tags:
+      - 'v*'
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build:
+    name: Build prebuilds for ${{ matrix.os }}-${{ matrix.arch }}
+    runs-on: ${{ matrix.os }}
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Linux builds
+          - os: ubuntu-20.04
+            arch: x64
+          - os: ubuntu-20.04
+            arch: arm64
+          
+          # macOS builds
+          - os: macos-12
+            arch: x64
+          - os: macos-14
+            arch: arm64
+          
+          # Windows builds
+          - os: windows-2022
+            arch: x64
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      # Linux: Install Mimer SQL
+      - name: Install Mimer SQL (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          # Download and install Mimer SQL for Linux
+          # Example (update URL to actual Mimer SQL package):
+          # wget https://download.mimer.com/pub/dist/linux_x86_64/mimersql1109_11.0.9E-49534_amd64-openssl1.deb
+          # sudo dpkg -i mimersql1109_11.0.9E-49534_amd64-openssl1.deb
+          #
+          # After installation, mimerapi.h should be in /usr/include
+          # and libmimerapi.so in /usr/lib or /usr/lib64
+          echo "Mimer SQL should be installed to standard locations"
+
+      # macOS: Install Mimer SQL
+      - name: Install Mimer SQL (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          # Download and install Mimer SQL for macOS
+          # Example:
+          # wget https://download.mimer.com/pub/dist/macos_universal/mimersql1109-11.0.9E-49534_macos-universal.pkg
+          # sudo installer -pkg mimersql1109-11.0.9E-49534_macos-universal.pkg -target /
+          #
+          # After installation, mimerapi.h should be in /usr/local/include
+          # and libmimerapi.dylib in /usr/local/lib
+          echo "Mimer SQL should be installed to standard locations"
+
+      # Windows: Install Mimer SQL and set MIMER_HOME
+      - name: Install Mimer SQL (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          # Download and install Mimer SQL for Windows
+          # Example:
+          # Download installer and run it
+          echo "MIMER_HOME=C:\Program Files\Mimer SQL Experience 11.0" >> $env:GITHUB_ENV
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build prebuild
+        run: npm run prebuild
+
+      - name: Upload prebuilds
+        uses: actions/upload-artifact@v4
+        with:
+          name: prebuilds-${{ matrix.os }}-${{ matrix.arch }}
+          path: prebuilds/
+          retention-days: 30
+
+  release:
+    name: Create Release
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download all prebuilds
+        uses: actions/download-artifact@v4
+        with:
+          path: all-prebuilds
+
+      - name: Consolidate prebuilds
+        run: |
+          mkdir -p prebuilds
+          cp -r all-prebuilds/prebuilds-*/* prebuilds/
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: prebuilds/**/*
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

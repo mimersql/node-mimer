@@ -1,0 +1,38 @@
+{
+  "name": "@mimersql/node-mimer",
+  "version": "1.0.0",
+  "description": "Node.js bindings for Mimer SQL using Mimer API",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "lib/"
+  ],
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "check-mimer": "node scripts/check-mimer.js"
+  },
+  "keywords": [
+    "mimer",
+    "mimersql",
+    "database",
+    "sql"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mimersql/node-mimer.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mimersql/node-mimer/issues"
+  },
+  "homepage": "https://github.com/mimersql/node-mimer#readme",
+  "author": "Fredrik Ålund <fredrik.alund@mimer.com>",
+  "license": "MIT",
+  "dependencies": {
+    "koffi": "^2.15.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

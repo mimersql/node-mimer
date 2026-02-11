@@ -367,7 +367,7 @@ try {
 
 By default, `node-mimer` uses the Koffi FFI backend (pure JavaScript).
 
-If the optional [`node-mimer-native`](https://github.com/user/node-mimer-native)
+If the optional [`@mimersql/node-mimer-native`](https://github.com/mimersql/node-mimer-native)
 package is installed, it will be used instead. This can be useful as a fallback
 if Koffi is ever unavailable for a given platform.
 
@@ -377,7 +377,7 @@ You can force a specific backend with the `NODE_MIMER_BACKEND` environment varia
 # Force Koffi FFI (default)
 NODE_MIMER_BACKEND=koffi npm test
 
-# Force native C++ addon (requires node-mimer-native)
+# Force native C++ addon (requires @mimersql/node-mimer-native)
 NODE_MIMER_BACKEND=native npm test
 ```
 
@@ -576,7 +576,7 @@ node --test test/unicode.test.js
 
 # Test with a specific backend
 NODE_MIMER_BACKEND=koffi npm test
-NODE_MIMER_BACKEND=native npm test   # requires node-mimer-native
+NODE_MIMER_BACKEND=native npm test   # requires @mimersql/node-mimer-native
 ```
 
 ## Architecture
@@ -596,7 +596,7 @@ JavaScript Wrapper (Promise-based)
         v
 Koffi FFI Backend (lib/koffi-binding.js)
   — or —
-node-mimer-native (C++ addon, optional)
+@mimersql/node-mimer-native (C++ addon, optional)
         |
         | FFI / Node-API calls
         v
@@ -611,7 +611,7 @@ functions directly using [Koffi](https://koffi.dev/), an FFI library that ships
 its own prebuilt binaries. This means `node-mimer` is a pure JavaScript package
 with no native compilation step.
 
-The optional `node-mimer-native` package provides the same interface using a
+The optional `@mimersql/node-mimer-native` package provides the same interface using a
 C++ Node-API addon. It can be installed alongside `node-mimer` as a drop-in
 replacement if needed.
 

@@ -40,7 +40,7 @@ Mimer SQL C API directly — no C++ compilation required.
             └────────────────────────────┘
 ```
 
-An optional C++ native addon is available as the separate `node-mimer-native`
+An optional C++ native addon is available as the separate `@mimersql/node-mimer-native`
 package. When installed, it is used automatically instead of Koffi.
 
 ## Component Description
@@ -152,14 +152,14 @@ await pool.end();
 `lib/native.js` loads the binding backend with this priority:
 
 1. If `NODE_MIMER_BACKEND=koffi` — force Koffi FFI
-2. If `NODE_MIMER_BACKEND=native` — force `node-mimer-native` (C++ addon)
-3. Otherwise: try `node-mimer-native`, fall back to Koffi
+2. If `NODE_MIMER_BACKEND=native` — force `@mimersql/node-mimer-native` (C++ addon)
+3. Otherwise: try `@mimersql/node-mimer-native`, fall back to Koffi
 
 ```bash
 # Force Koffi backend
 NODE_MIMER_BACKEND=koffi npm test
 
-# Force native backend (requires node-mimer-native)
+# Force native backend (requires @mimersql/node-mimer-native)
 NODE_MIMER_BACKEND=native npm test
 ```
 
@@ -207,7 +207,7 @@ node-mimer/
 - **No compilation needed** — pure JS, works everywhere Koffi supports
 - **Same C API** — both Koffi and the C++ addon call `libmimerapi.so`
 - **Simpler distribution** — no prebuilt binaries, no node-gyp fallback
-- **Optional native addon** — `node-mimer-native` available for users who prefer C++
+- **Optional native addon** — `@mimersql/node-mimer-native` available for users who prefer C++
 
 ### 2. Promise-based API
 - Modern JavaScript idiom
@@ -397,7 +397,7 @@ NODE_MIMER_BACKEND=native npm test
 
 ## Related Packages
 
-- **node-mimer-native** — Optional C++ native addon backend. Install alongside
+- **@mimersql/node-mimer-native** — Optional C++ native addon backend. Install alongside
   `node-mimer` to use the C++ binding instead of Koffi FFI.
 
 ## License

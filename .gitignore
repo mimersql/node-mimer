@@ -15,6 +15,9 @@ out/
 # Compiled binaries (local development - NEVER commit)
 *.node
 
+# Cross-compilation libraries (build-time only, not shipped)
+platform_lib/
+
 # Prebuilds (prebuilt binaries for distribution)
 # UNCOMMENT the line below if you DON'T want to commit prebuilds to git
 # (They can be uploaded as GitHub release assets instead)

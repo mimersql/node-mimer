@@ -4,8 +4,8 @@ Node.js driver for Mimer SQL using the Mimer SQL C API.
 
 ## Features
 
-- Direct bindings to the Mimer SQL C API via [Koffi](https://koffi.dev/) FFI - no ODBC required
-- Pure JavaScript - no C++ compiler needed at install time
+- Native C++ bindings to the Mimer SQL C API via Node-API — no ODBC required
+- Prebuilt binaries for supported platforms — no compiler needed at install time
 - Promise-based API
 - Parameterized queries with `?` placeholders (SQL injection safe)
 - Prepared statements for repeated execution
@@ -21,16 +21,16 @@ Node.js driver for Mimer SQL using the Mimer SQL C API.
 - Node.js 18.0 or later
 - Mimer SQL 11.0 or later installed (the `libmimerapi` shared library must be available)
 
-No C++ compiler is required. The package uses Koffi FFI to call the Mimer SQL C API
-directly from JavaScript.
-
 ## Installation
 
 ```bash
 npm install @mimersql/node-mimer
 ```
 
-That's it. No native compilation, no prebuilt binaries to download.
+Prebuilt binaries are included for supported platforms (linux-x64, linux-arm64,
+darwin-x64, darwin-arm64, win32-x64). On other platforms, the install script
+will compile from source using `node-gyp` (requires a C++ compiler and Mimer SQL
+development headers).
 
 ### Verifying Mimer SQL is found
 
@@ -363,24 +363,6 @@ try {
 | BOOLEAN | Boolean |
 | NULL | null |
 
-## Backend Selection
-
-By default, `node-mimer` uses the Koffi FFI backend (pure JavaScript).
-
-If the optional [`@mimersql/node-mimer-native`](https://github.com/mimersql/node-mimer-native)
-package is installed, it will be used instead. This can be useful as a fallback
-if Koffi is ever unavailable for a given platform.
-
-You can force a specific backend with the `NODE_MIMER_BACKEND` environment variable:
-
-```bash
-# Force Koffi FFI (default)
-NODE_MIMER_BACKEND=koffi npm test
-
-# Force native C++ addon (requires @mimersql/node-mimer-native)
-NODE_MIMER_BACKEND=native npm test
-```
-
 ## API Reference
 
 ### MimerClient
@@ -573,15 +555,9 @@ npm test
 
 # Run a single test file
 node --test test/unicode.test.js
-
-# Test with a specific backend
-NODE_MIMER_BACKEND=koffi npm test
-NODE_MIMER_BACKEND=native npm test   # requires @mimersql/node-mimer-native
 ```
 
 ## Architecture
-
-The library has two layers:
 
 ```
 Application (JavaScript)
@@ -592,13 +568,13 @@ JavaScript Wrapper (Promise-based)
   index.js, lib/client.js, lib/prepared.js,
   lib/resultset.js, lib/pool.js
         |
-        | lib/native.js (backend selection)
+        | lib/native.js (loads native addon)
         v
-Koffi FFI Backend (lib/koffi-binding.js)
-  — or —
-@mimersql/node-mimer-native (C++ addon, optional)
+C++ Native Addon (Node-API)
+  src/connection.cc, src/statement.cc,
+  src/resultset.cc, src/helpers.cc
         |
-        | FFI / Node-API calls
+        | C API calls
         v
 Mimer SQL C API (libmimerapi.so)
         |
@@ -606,14 +582,12 @@ Mimer SQL C API (libmimerapi.so)
 Mimer SQL Database
 ```
 
-The Koffi FFI backend (`lib/koffi-binding.js`) calls the Mimer SQL C API
-functions directly using [Koffi](https://koffi.dev/), an FFI library that ships
-its own prebuilt binaries. This means `node-mimer` is a pure JavaScript package
-with no native compilation step.
-
-The optional `@mimersql/node-mimer-native` package provides the same interface using a
-C++ Node-API addon. It can be installed alongside `node-mimer` as a drop-in
-replacement if needed.
+The package ships prebuilt `.node` binaries for supported platforms via
+[prebuildify](https://github.com/prebuild/prebuildify). At install time,
+`prebuild-install` downloads the matching binary. If no prebuilt is available,
+the addon is compiled from source using `node-gyp`. The native addon uses
+[Node-API](https://nodejs.org/api/n-api.html) (N-API v8), so binaries are
+stable across Node.js versions without recompilation.
 
 ### Mimer SQL C API Functions Used
 
@@ -633,18 +607,28 @@ replacement if needed.
 
 ```
 node-mimer/
+├── src/                          # C++ native addon
+│   ├── mimer_addon.cc           # Module entry point
+│   ├── connection.cc/h          # Connection class
+│   ├── statement.cc/h           # Prepared statement class
+│   ├── resultset.cc/h           # Cursor/streaming result set class
+│   └── helpers.cc/h             # Parameter binding, row fetching, errors
+│
 ├── lib/                          # JavaScript modules
-│   ├── native.js                # Backend selection (Koffi or native)
-│   ├── koffi-binding.js         # Koffi FFI backend
-│   ├── find-mimer-library.js    # Platform-specific library detection
+│   ├── native.js                # Loads native addon via node-gyp-build
 │   ├── client.js                # MimerClient, connect()
 │   ├── prepared.js              # PreparedStatement
 │   ├── resultset.js             # ResultSet (cursor wrapper)
 │   └── pool.js                  # Pool, PoolClient
 │
-├── scripts/
-│   └── check-mimer.js           # Verify Mimer installation
+├── prebuilds/                    # Prebuilt binaries (per platform)
+│   └── linux-x64/               # Example: Linux x64 binary
 │
+├── scripts/
+│   ├── check-mimer.js           # Verify Mimer installation
+│   └── find-mimer-windows.js    # Auto-detect Mimer on Windows
+│
+├── binding.gyp                   # Native addon build configuration
 ├── index.js                      # Re-exports from lib/
 ├── index.d.ts                    # TypeScript type definitions
 ├── package.json
@@ -667,4 +651,4 @@ Contributions are welcome! Please submit pull requests or open issues on GitHub.
 
 - [Mimer SQL Documentation](https://developer.mimer.com/documentation)
 - [Mimer SQL C API Reference](https://developer.mimer.com/mimerapi)
-- [Koffi FFI Library](https://koffi.dev/)
+- [Node-API Documentation](https://nodejs.org/api/n-api.html)

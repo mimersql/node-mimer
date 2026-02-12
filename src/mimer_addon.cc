@@ -20,16 +20,30 @@
 //
 // See license for more details.
 
-'use strict';
+#include <napi.h>
+#include "connection.h"
+#include "statement.h"
+#include "resultset.h"
 
 /**
- * Load the native Mimer SQL binding.
- *
- * Uses node-gyp-build to find the binary:
- *   1. prebuilds/<platform>-<arch>/ (shipped in the npm package)
- *   2. build/Release/ (compiled from source at install time)
+ * Initialize the Mimer addon module
+ * This is the entry point when Node.js loads the module
  */
+Napi::Object Init(Napi::Env env, Napi::Object exports) {
+  // Export the Connection class
+  MimerConnection::Init(env, exports);
 
-const path = require('path');
+  // Export the Statement class
+  MimerStmtWrapper::Init(env, exports);
 
-module.exports = require('node-gyp-build')(path.join(__dirname, '..'));
+  // Export the ResultSet class
+  MimerResultSetWrapper::Init(env, exports);
+
+  // Export version information
+  exports.Set("version", Napi::String::New(env, "1.0.0"));
+
+  return exports;
+}
+
+// Register the module with Node.js
+NODE_API_MODULE(mimer, Init)

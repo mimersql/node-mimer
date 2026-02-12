@@ -1,5 +1,6 @@
 # Node.js
 node_modules/
+package-lock.json
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
@@ -56,15 +57,10 @@ tmp/
 temp/
 *.tmp
 
-# Package files (keep package.json and package-lock.json)
+# Package files (keep package.json)
 *.tgz
 
 # Python (for node-gyp)
 __pycache__/
 *.py[cod]
 *$py.class
-
-# VS Code SQLTools extension build
-sqltools-driver/out/
-sqltools-driver/dist/
-sqltools-driver/*.vsix
